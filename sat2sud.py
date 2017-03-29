@@ -44,8 +44,8 @@ def print_sol_basic(sol):
 
 
 def main():
-    std_in = sys.stdin.read().replace('\n', ' ').split()
-    solvable = std_in.pop(0) == "SAT"
+    solvable = sys.stdin.readline().replace('\n', '') == "SAT"
+    std_in = sys.stdin.readline().split()
     if solvable:
         sol = construct_grid(std_in)
         print_sol_basic(sol)
