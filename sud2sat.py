@@ -1,4 +1,4 @@
-import sys
+import sys, getopt
 
 
 def get_index(i, j, k):
@@ -27,15 +27,14 @@ def blank_cell(k):
     return False
 
 
-def read_input(clauses):
+def filled_cells(clauses, sud):
     """
     Reads the sudoku grid input and appends a clause for each filled cell
     (i, j, k) -> true
     :param clauses: the list of clauses in CNF
     """
-    std_in = list(sys.stdin.read())
     index = 0
-    for k in std_in:
+    for k in sud:
         if k == '\n':
             continue
         if not blank_cell(k):
@@ -112,13 +111,42 @@ def sub_grid(clauses):
                                 clauses.append("-%d -%d" % (get_index(i1, j1, k), get_index(i2, j2, k)))
 
 
+def get_input_file():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hi:v', ["help", "input="])
+    except getopt.GetoptError:
+        print 'sud2sat -i <inputfile>'
+        sys.exit(2)
+    if not opts:
+        print 'sud2sat -i <inputfile>'
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'sud2sat -i <inputfile>'
+            sys.exit()
+        elif opt in ("-i", "--input"):
+            return arg
+
+
+def read(filename):
+    try:
+        with open(filename) as f:
+            sud = f.read()
+    except Exception as error:
+        print(error)
+        sys.exit(1)
+    return list(sud)
+
+
 def main():
     clauses = []
+    inputfile = get_input_file();
+    sud = read(inputfile);
+    filled_cells(clauses, sud)
     cells(clauses)
     rows(clauses)
     columns(clauses)
     sub_grid(clauses)
-    read_input(clauses)
     num_clauses = len(clauses)
     num_variables = get_index(8, 8, 8)
     print("p cnf %d %d" % (num_variables, num_clauses))

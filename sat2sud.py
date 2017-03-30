@@ -1,4 +1,28 @@
-import sys
+import sys, getopt
+
+
+def main():
+    inputfile = get_input_file()
+    ent = read(inputfile)
+    done = construct_grid(ent)
+    print_sol_basic(done)
+
+
+def get_input_file():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hi:v', ["help", "input="])
+    except getopt.GetoptError:
+        print 'sat2sud -i <inputfile>'
+        sys.exit(2)
+    if not opts:
+        print 'sat2sud -i <inputfile>'
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'sat2sud -i <inputfile>'
+            sys.exit()
+        elif opt in ("-i", "--input"):
+            return arg
 
 
 def get_ijk(index):
@@ -23,6 +47,7 @@ def construct_grid(sat):
     :param sat: a list of the variables in the sat solution
     :return: a filled 9x9 array with the sudoku solution
     """
+
     cursor = 0
     sol = [[0 for _ in range(9)] for _ in range(9)]
     while sat[cursor] != '0':
@@ -39,18 +64,18 @@ def print_sol_basic(sol):
     :param sol: a filled 9x9 array with the sudoku solution
     Prints the solution with columns separated by 2 spaces
     """
-    print('\n'.join([''.join(['{:3}'.format(num) for num in row])
-                     for row in sol]))
+    print('\n'.join([''.join(['{:3}'.format(num) for num in row]) for row in sol]))
 
 
-def main():
-    solvable = sys.stdin.readline().replace('\n', '') == "SAT"
-    std_in = sys.stdin.readline().split()
-    if solvable:
-        sol = construct_grid(std_in)
-        print_sol_basic(sol)
-    else:
-        print("UNSOLVABLE SUDOKU")
+def read(filename):
+    try:
+        with open(filename) as f:
+            sol = f.read()
+    except Exception as error:
+        print(error)
+        sys.exit(1)
+    final = sol.split()
+    return final[1:]
 
 
 if __name__ == "__main__":
