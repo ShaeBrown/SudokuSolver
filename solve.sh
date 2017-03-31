@@ -1,5 +1,5 @@
 #!/bin/bash
-#Test files named 01.txt, 02.txt .. num_files.txt
+#Test files named 01.txt, 02.txt .. num_files.txt in folder named test
 #Produces a report in sol.txt
 num_files=95
 time_sum=0
@@ -8,7 +8,7 @@ mkdir cnf
 mkdir cnfsol
 for i in $(seq -f "%02g" 1 ${num_files})
 do
-   input="./hard/${i}.txt"
+   input="./test/${i}.txt"
    out="./cnf/cnf${i}.txt"
    python sud2sat.py -i ${input} > ${out}
 done
