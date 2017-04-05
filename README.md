@@ -4,7 +4,7 @@
 Input to sud2sat must be provided by a file.\
 `python sud2sat.py -i <inputfile>`\
 To output the results to another file:\
-`python sud2sat.py -i <inputfile> > <outputfile>`
+`python sud2sat.py -i <inputfile> > <outputfile>`\
 To output the results in GSAT format.\
 `python sud2sat.py -i <inputfile> --gsat`
 
