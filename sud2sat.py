@@ -1,6 +1,5 @@
 import sys, getopt
 
-
 def get_index(i, j, k):
     """
     :param i: row number (0-8) of the sudoku
@@ -9,22 +8,6 @@ def get_index(i, j, k):
     :return: the index (positive base 8 number)
     """
     return (81 * i) + (9 * j) + k + 1
-
-
-def blank_cell(k):
-    """
-    :param k: the character of the cell
-    :return: True, if the character is encoded as a blank cell, otherwise False
-    """
-    if k == '0':
-        return True
-    if k == '.':
-        return True
-    if k == '*':
-        return True
-    if k == '?':
-        return True
-    return False
 
 
 def filled_cells(clauses, sud):
@@ -37,7 +20,7 @@ def filled_cells(clauses, sud):
     for k in sud:
         if k == '\n':
             continue
-        if not blank_cell(k):
+        if k not in ['0', '.', '*', '?']:
             i = index / 9
             j = index % 9
             ijk = get_index(i, j, int(k) - 1)
@@ -112,20 +95,27 @@ def sub_grid(clauses):
 
 
 def get_input_file():
+    filename = ""
+    GSAT = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hi:v', ["help", "input="])
-    except getopt.GetoptError:
+        opts, args = getopt.getopt(sys.argv[1:], 'hi:v', ["help", "input=", "gsat"])
+    except getopt.GetoptError as e:
+        print(e)
         print 'sud2sat -i <inputfile>'
         sys.exit(2)
     if not opts:
         print 'sud2sat -i <inputfile>'
         sys.exit(2)
+    print(opts)
     for opt, arg in opts:
         if opt == '-h':
             print 'sud2sat -i <inputfile>'
             sys.exit()
         elif opt in ("-i", "--input"):
-            return arg
+            filename = arg
+        elif opt == "--gsat":
+            GSAT = True
+    return filename, GSAT
 
 
 def read(filename):
@@ -138,20 +128,32 @@ def read(filename):
     return list(sud)
 
 
+def print_CNF(clauses):
+    num_clauses = len(clauses)
+    num_variables = get_index(8, 8, 8)
+    print("p cnf %d %d" % (num_variables, num_clauses))
+    for clause in clauses:
+        print(clause + " 0")
+
+
+def print_GSAT(clauses):
+    for clause in clauses:
+        print("(" + clause + ")")
+
+
 def main():
     clauses = []
-    inputfile = get_input_file();
+    inputfile, GSAT = get_input_file();
     sud = read(inputfile);
     filled_cells(clauses, sud)
     cells(clauses)
     rows(clauses)
     columns(clauses)
     sub_grid(clauses)
-    num_clauses = len(clauses)
-    num_variables = get_index(8, 8, 8)
-    print("p cnf %d %d" % (num_variables, num_clauses))
-    for clause in clauses:
-        print(clause + " 0")
+    if GSAT:
+        print_GSAT(clauses)
+    else:
+        print_CNF(clauses)
 
 
 if __name__ == "__main__":
